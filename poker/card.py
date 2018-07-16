@@ -4,10 +4,10 @@ class Card(object):
 		rank, suit = tuple(properties)
 
 		if rank not in [str(n) for n in list(range(2, 10))] + list('TJQKA'):
-			raise ValueError('Invalid card rank')
+			raise ValueError('Invalid card rank {0!r}'.format(rank))
 
 		if suit not in list('CDHS'):
-			raise ValueError('Invalid card suit')
+			raise ValueError('Invalid card suit {0!r}'.format(suit))
 
 		if rank == 'T':
 			self._rank = 10
