@@ -16,25 +16,73 @@ class Hand(collections.MutableSequence):
 			raise ValueError('A hand cannot contain duplicate cards')
 
 		self._cards = cards
-		self._score = self.calculate_score()
 		self._rank_counts = self.count_ranks()
+		self._score = self.calculate_score()
 
 
 	def calculate_score(self):
+		score = 0
 		hand_category_rank = self.get_category_rank()
-		tiebreakers = self.get_tiebreakers(hand_category_rank)
+		tiebreakers = self.get_tiebreakers()
+		
+		if hand_category_rank == 'straight flush':
+			r = 8
+		elif hand_category_rank == 'four of a kind':
+			r = 7
+		elif hand_category_rank == 'full house':
+			r = 6
+		elif hand_category_rank == 'flush':
+			r = 5
+		elif hand_category_rank == 'straight':
+			r = 4
+		elif hand_category_rank == 'three of a kind':
+			r = 3
+		elif hand_category_rank == 'two pair':
+			r = 2
+		elif hand_category_rank == 'one pair':
+			r = 1
+		elif hand_category_rank == 'high card':
+			r = 0
+
+		score += r * 15**6
+
+		for idx, tie in zip(range(5, -1, -1), tiebreakers):
+			score += tie * 15**idx
+
+		return score
 
 
 	def get_category_rank(self):
-		pass
+		if self.is_straight_flush():
+			return 'straight flush'
+		elif self.is_four_kind():
+			return 'four of a kind'
+		elif self.is_full_house():
+			return 'full house'
+		elif self.is_flush():
+			return 'flush'
+		elif self.is_straight():
+			return 'straight'
+		elif self.is_three_kind():
+			return 'three of a kind'
+		elif self.is_two_pair():
+			return 'two pair'
+		elif self.is_one_pair():
+			return 'one pair'
+		elif self.is_high():
+			return 'high card'
+		else:
+			raise ValueError('Couldn\'t score hand')
 
 
 	def get_tiebreakers(self):
-		pass
+		return [t[0] for t in self._rank_counts]
 
 
 	def count_ranks(self):
-		return collections.Counter([c.rank for c in self._cards]).most_common()
+		rank_counts = collections.Counter([c.rank for c in self._cards]).most_common()
+		rank_counts.sort(key=lambda tup: (-tup[1], -tup[0]))
+		return rank_counts
 
 	def is_straight_flush(self):
 		return self.is_straight() and self.is_flush()
@@ -51,16 +99,7 @@ class Hand(collections.MutableSequence):
 
 
 	def is_straight(self):
-		self.sort(reverse=True)
-		ranks = [c.rank for c in self._cards]
-		if ranks[0] - ranks[4] == 4:
-			return True
-		elif max(ranks) == 14:
-			ranks[ranks.index(14)] = 1
-			ranks.sort(reverse=True)
-			return ranks[0] - ranks[4] == 4
-		else:
-			return False
+		return self.is_high_straight() or self.is_low_straight()
 
 
 	def is_high_straight(self):
@@ -144,6 +183,25 @@ class Hand(collections.MutableSequence):
 
 	def sort(self, key=None, reverse=None):
 		self._cards.sort(key=key, reverse=reverse)
+
+
+	def __lt__(a, b):
+		return a._score < b._score
+
+	def __le__(a, b):
+		return a._score <= b._score
+
+	def __eq__(a, b):
+		return a._score == b._score
+
+	def __ne__(a, b):
+		return a._score != b._score
+
+	def __ge__(a, b):
+		return a._score >= b._score
+
+	def __gt__(a, b):
+		return a._score > b._score
 
 
 	def __repr__(self):
