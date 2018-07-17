@@ -41,7 +41,7 @@ def high_card():
 
 
 def test_valid_hand(straight_flush):
-	assert repr(straight_flush) == 'Hand(\'6C\',\'5C\',\'4C\',\'3C\',\'2C\')'
+	assert repr(straight_flush) == 'Hand(\'2C\',\'3C\',\'4C\',\'5C\',\'6C\')'
 
 def test_invalid_hand_duplicate_cards():
 	with pytest.raises(ValueError):

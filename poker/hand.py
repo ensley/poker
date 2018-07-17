@@ -103,21 +103,22 @@ class Hand(collections.MutableSequence):
 
 
 	def is_high_straight(self):
-		self.sort(reverse=True)
+		if len(self._rank_counts) != 5:
+			return False
 		ranks = [c.rank for c in self._cards]
-		return ranks[0] - ranks[4] == 4
+		return max(ranks) - min(ranks) == 4
 
 
 	def is_low_straight(self):
-		self.sort(reverse=True)
+		if len(self._rank_counts) != 5:
+			return False
+
 		ranks = [c.rank for c in self._cards]
-		
 		if max(ranks) != 14:
 			return False
 
 		ranks[ranks.index(14)] = 1
-		ranks.sort(reverse=True)
-		return ranks[0] - ranks[4] == 4
+		return max(ranks) - min(ranks) == 4
 
 
 			
